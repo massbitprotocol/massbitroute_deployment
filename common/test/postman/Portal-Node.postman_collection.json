@@ -1,0 +1,355 @@
+{
+	"info": {
+		"_postman_id": "135df086-ce43-4090-b740-38b6b264a249",
+		"name": "Portal-Node",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Login response should contain accessToken', () => {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData.accessToken).to.be.a(\"string\");",
+							"    pm.environment.set(\"accessToken\", responseData.accessToken);",
+							"    postman.setNextRequest(\"GetUserInfo\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\":\"{{username}}\",\n    \"password\":\"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{portal_url}}/auth/login",
+					"host": [
+						"{{portal_url}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetUserInfo",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Get user info response should contain id field', () => {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData.id).to.be.a(\"string\");",
+							"    pm.expect(responseData.walletAddress).to.be.a(\"string\");",
+							"    pm.environment.set(\"userId\", responseData.id);",
+							"    pm.environment.set(\"walletAddress\", responseData.walletAddress);",
+							"    postman.setNextRequest(\"CreateNode\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{portal_url}}/user/info",
+					"host": [
+						"{{portal_url}}"
+					],
+					"path": [
+						"user",
+						"info"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateNode",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"nodePrefix\", \"node-\" + (Math.random() + 1).toString(36).substring(7))"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Create node response should be contain id and appKey', () => {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData.appKey).to.be.a(\"string\");",
+							"    pm.expect(responseData.id).to.be.a(\"string\");",
+							"    pm.environment.set(\"providerKey\", responseData.appKey);",
+							"    pm.environment.set(\"providerId\", responseData.id);",
+							"    pm.environment.set(\"providerType\", \"node\");",
+							"    let nodeInfo = {",
+							"        id: pm.variables.get('providerId'),",
+							"        user_id: pm.variables.get('userId'),",
+							"        blockchain: pm.iterationData.get('blockchain'),",
+							"        network:pm.iterationData.get('network'),",
+							"        zone: pm.iterationData.get(\"mbr-zone\"),",
+							"        app_key: pm.variables.get(\"providerKey\"),",
+							"        env: pm.environment.name,",
+							"        portal_url: pm.environment.get('portal_url')",
+							"    };",
+							"    let params = [];",
+							"    for (key in nodeInfo) {",
+							"        params.push(key + '=' + nodeInfo[key]);",
+							"    }",
+							"    const install_url = pm.environment.get(\"portal_url\") + \"/api/v1/node_install?\" + params.join('&');",
+							"    console.log(install_url);",
+							"    postman.setNextRequest(\"CheckCreatedNode\");",
+							"});",
+							"",
+							"//Call to portal makesure node has status created"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"{{nodePrefix}}-{{mbr-zone}}\",\n    \"blockchain\": \"{{blockchain}}\",\n    \"zone\": \"{{mbr-zone}}\",\n    \"dataSource\": \"{{datasource}}\",\n    \"dataSourceWs\": \"{{datasourcews}}\",\n    \"network\": \"{{network}}\"\n}\n"
+				},
+				"url": {
+					"raw": "{{portal_url}}/mbr/node",
+					"host": [
+						"{{portal_url}}"
+					],
+					"path": [
+						"mbr",
+						"node"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetNodeConfig",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Node config should contain line sever_name {{nodeId}}-node.mbr.{{env}}', () => {",
+							"    const responseData = pm.response.text();",
+							"    pm.expect(responseData).to.be.a(\"string\");",
+							"    const arrayOfLines = responseData.split(\"\\n\");",
+							"    let nodeId = pm.environment.get('providerId');",
+							"    let hasServerName = false;",
+							"    for (let i = 0; i < arrayOfLines.length; i++) {",
+							"        let rowValue = arrayOfLines[i].trim();",
+							"        if (rowValue.indexOf('server_name') >= 0 && rowValue.indexOf(nodeId) >= 0) {",
+							"            hasServerName = true;",
+							"            break;",
+							"        }",
+							"    }",
+							"    pm.expect(hasServerName).to.be.true",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{portal_url}}/deploy/nodeconf/{{providerId}}.conf",
+					"host": [
+						"{{portal_url}}"
+					],
+					"path": [
+						"deploy",
+						"nodeconf",
+						"{{providerId}}.conf"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CheckCreatedNode",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Created node response should has status: created', () => {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData.status).to.be.a(\"string\");",
+							"    pm.expect(responseData.status).to.be.eq(\"created\");",
+							"    pm.expect(responseData.id).to.eq(pm.environment.get(\"providerId\"));",
+							"    postman.setNextRequest(\"DeleteNode\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{portal_url}}/mbr/node/{{providerId}}",
+					"host": [
+						"{{portal_url}}"
+					],
+					"path": [
+						"mbr",
+						"node",
+						"{{providerId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteNode",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"nodePrefix\", \"node\" + (Math.random() + 1).toString(36).substring(7))"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Delete node response should be contain true field', () => {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData.status).to.be.a(\"string\");",
+							"    pm.expect(responseData.status).to.be.eq(\"true\");",
+							"    let url = pm.environment.get(\"portal_url\") + \"/mbr/node/\" + pm.environment.get(\"providerId\");",
+							"    pm.sendRequest(url, (error, response) => {",
+							"        if (error) {",
+							"            console.log(error);",
+							"        }",
+							"        let responseData = response.text();",
+							"        pm.test('response should contain serverName block', () => {",
+							"            pm.expect(responseData).contains(serverName);",
+							"        });",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"{{nodePrefix}}-{{mbr-zone}}-{{id}}\",\n    \"blockchain\": \"{{blockchain}}\",\n    \"zone\": \"{{mbr-zone}}\",\n    \"dataSource\": \"{{datasource}}\",\n    \"dataSourceWs\": \"{{datasourcews}}\",\n    \"network\": \"{{network}}\"\n}\n"
+				},
+				"url": {
+					"raw": "{{portal_url}}/mbr/node/{{providerId}}",
+					"host": [
+						"{{portal_url}}"
+					],
+					"path": [
+						"mbr",
+						"node",
+						"{{providerId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "nodePrefix",
+			"value": ""
+		}
+	]
+}

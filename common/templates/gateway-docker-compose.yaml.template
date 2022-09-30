@@ -1,0 +1,49 @@
+version: '3.8'
+networks:
+  mbr_test_network_[[NETWORK_NUMBER]]:
+    driver: bridge
+    external: true
+    # ipam:
+      # config:
+      #     - subnet: "172.24.[[NETWORK_NUMBER]].0/16"
+services:
+  gateway_[[NETWORK_NUMBER]]_[[BLOCKCHAIN]]_[[NETWORK]]_[[DOCKER_ID]]:
+    privileged: true
+    networks:
+      mbr_test_network_[[NETWORK_NUMBER]]:
+
+    restart: unless-stopped
+    image: massbit/massbitroute_gateway:${GATEWAY_TAG}
+    command: "-n"
+    # build:
+    #   context: /massbit/massbitroute/app/src/sites/services/gateway
+    #   dockerfile: install/mbr/build/gateway/Dockerfile.dev
+    #   args:
+    #     VERSION: 0.0.1-shamu-dev
+    #     BRANCH: shamu
+    container_name: mbr_gateway_[[NETWORK_NUMBER]]_[[BLOCKCHAIN]]_[[NETWORK]]_[[DOCKER_ID]]
+    volumes:
+      - ./gateway/[[DOCKER_ID]]/logs:/massbit/massbitroute/app/src/sites/services/gateway/logs:rw
+    environment:
+      - MBR_ENV=${GATEWAY_TAG}
+      - DOMAIN=massbitroute.net
+      - SESSION_ENABLE=true
+      - PORTAL_URL=[[PROTOCOL]]://portal.massbitroute.net
+      - INSTALL_CMD=[[PROTOCOL]]://portal.massbitroute.net/api/v1/gateway_install?id=[[GATEWAY_ID]]&user_id=[[USER_ID]]&blockchain=[[BLOCKCHAIN]]&network=[[NETWORK]]&zone=[[ZONE]]&app_key=[[APP_KEY]]&portal_url=[[PROTOCOL]]://portal.massbitroute.net&env=[[GIT_PRIVATE_BRANCH]]
+
+    extra_hosts:
+      - "hostmaster.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "ns1.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "ns2.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "api.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "session.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "stat.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "monitor.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "chain.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[CHAIN_IP]]"
+      - "portal.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "admin-api.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "dapi.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "scheduler.fisherman.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "api.ipapi.com:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "staking.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "ipv4.icanhazip.com:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"

@@ -1,0 +1,54 @@
+version: '3.8'
+networks:
+  mbr_test_network_[[NETWORK_NUMBER]]:
+    driver: bridge
+    external: true
+    # ipam:
+      # config:
+      #     - subnet: "172.24.[[NETWORK_NUMBER]].0/16"
+services:
+  git_[[NETWORK_NUMBER]]:
+    privileged: true
+    networks:
+      mbr_test_network_[[NETWORK_NUMBER]]:
+        ipv4_address: "172.24.[[NETWORK_NUMBER]].[[GIT_IP]]"
+
+    restart: unless-stopped
+    image: massbit/massbitroute_git:[[GIT_TAG]]
+    command: "-n"
+    # build:
+    #   context: /massbit/massbitroute/app/src/sites/services/git
+    #   dockerfile: install/mbr/build/git/Dockerfile.dev
+    #   args:
+    #     VERSION: 0.0.1-shamu-dev
+    #     BRANCH: shamu
+    container_name: mbr_git_[[NETWORK_NUMBER]]
+    volumes:
+      - ./git/deploy:/massbit/massbitroute/app/src/sites/services/git/deploy:rw
+      - ./git/logs:/massbit/massbitroute/app/src/sites/services/git/logs:rw
+      - ./git/vars:/massbit/massbitroute/app/src/sites/services/git/vars:rw
+      - ./git/data:/massbit/massbitroute/app/src/sites/services/git/data:rw
+      # - ./git/tmp:/massbit/massbitroute/app/src/sites/services/git/tmp:rw
+      - ./git/db:/massbit/massbitroute/app/src/sites/services/git/db:rw
+    environment:
+      - GIT_PUBLIC_URL="https://github.com"
+      - MBR_ENV=[[GIT_TAG]]
+      - DOMAIN=massbitroute.net
+      - MKAGENT_BRANCH=shamu
+      - GIT_PRIVATE_BRANCH=shamu
+      - STAT_PROMETHEUS_SCHEME=[[STAT_PROMETHEUS_SCHEME]]
+    extra_hosts:
+      - "hostmaster.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "ns1.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "ns2.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "api.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "stat.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "monitor.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "chain.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[CHAIN_IP]]"
+      - "portal.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "admin-api.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "dapi.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "scheduler.fisherman.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "api.ipapi.com:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "staking.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "git.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[GIT_IP]]"

@@ -1,0 +1,117 @@
+[
+  {
+    "method": "chain_getBlock",
+    "params": ["blockHash"],
+    "expect": true
+  },
+  {
+    "method": "chain_getBlockHash",
+    "params": ["blockNumber"],
+    "expect": true
+  },
+  {
+    "method": "chain_getFinalizedHead",
+    "params": [],
+    "expect": true
+  },
+  {
+    "method": "chain_getHead",
+    "params": ["blockNumber"],
+    "expect": true
+  },
+  {
+    "method": "chain_getHeader",
+    "params": ["blockHash"],
+    "expect": true
+  },
+  {
+    "method": "chain_getRuntimeVersion",
+    "params": [],
+    "expect": true
+  },
+  {
+    "method": "grandpa_roundState",
+    "params": [],
+    "expect": true
+  },
+  {
+    "method": "payment_queryFeeDetails",
+    "params": ["extrinsic", "blockHash"],
+    "expect": true
+  },
+  {
+    "method": "payment_queryInfo",
+    "params": ["extrinsic", "blockHash"],
+    "expect": true
+  },
+  {
+    "method": "rpc_methods",
+    "params": [],
+    "expect": true
+  },
+  {
+    "method": "state_getMetadata",
+    "params": [],
+    "expect": true
+  },
+  {
+    "method": "state_getRuntimeVersion",
+    "params": [],
+    "expect": true
+  },
+  {
+    "method": "system_chain",
+    "params": [],
+    "expect": true
+  },
+  {
+    "method": "system_chainType",
+    "params": [],
+    "expect": true
+  },
+  {
+    "method": "system_health",
+    "params": [],
+    "expect": true
+  },
+  {
+    "method": "system_localListenAddresses",
+    "params": [],
+    "expect": false
+  },
+  {
+    "method": "system_localPeerId",
+    "params": [],
+    "expect": false
+  },
+  {
+    "method": "system_name",
+    "params": [],
+    "expect": true
+  },
+  {
+    "method": "system_nodeRoles",
+    "params": [],
+    "expect": true
+  },
+  {
+    "method": "system_properties",
+    "params": [],
+    "expect": true
+  },
+  {
+    "method": "system_reservedPeers",
+    "params": [],
+    "expect": true
+  },
+  {
+    "method": "system_syncState",
+    "params": [],
+    "expect": true
+  },
+  {
+    "method": "system_version",
+    "params": [],
+    "expect": false
+  }
+]

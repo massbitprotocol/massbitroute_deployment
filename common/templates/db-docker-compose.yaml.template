@@ -1,0 +1,132 @@
+version: '3.8'
+services:
+  proxy_[[NETWORK_NUMBER]]:
+    container_name: mbr_proxy_[[NETWORK_NUMBER]]
+    image: massbit/massbitroute_test_proxy:${PROXY_TAG}
+    restart: always
+    networks:
+      mbr_test_network_[[NETWORK_NUMBER]]:
+        ipv4_address: "172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+    environment:
+      - DATASOURCE=[[PROTOCOL]]:\/\/34.81.232.186:8545
+      - DATASOURCE_WS=ws:\/\/34.81.232.186:8546
+      - DOMAIN=massbitroute.net
+      - NETWORK_NUMBER=[[NETWORK_NUMBER]]
+      - TEST_MODE=test
+    volumes:
+      - ./proxy/logs:/logs
+      - ./proxy/vars:/vars
+      - ./proxy/reports:/reports
+      - ./proxy/nginx.conf:/etc/nginx/conf.d/default.conf
+      #- ./proxy/resolv.conf:/etc/resolv.conf
+      - ./proxy/test:/test
+      #- /etc/letsencrypt:/etc/letsencrypt
+    extra_hosts:
+      - "hostmaster.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[GWMAN_IP]]"
+      - "ns1.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[GWMAN_IP]]"
+      - "ns2.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[GWMAN_IP]]"
+      - "api.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[API_IP]]"
+      - "session.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[SESSION_IP]]"
+      - "chain.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[CHAIN_IP]]"
+      - "portal.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PORTAL_IP]]"
+      - "admin-api.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[WEB_IP]]"
+      - "dapi.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[WEB_IP]]"
+      - "scheduler.fisherman.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[FISHERMAN_SCHEDULER_IP]]"
+      - "api.ipapi.com:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "staking.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[STAKING_IP]]"
+      - "git.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[GIT_IP]]"
+
+  db_[[NETWORK_NUMBER]]:
+    container_name: mbr_db_[[NETWORK_NUMBER]]
+    image: postgres:14.4-alpine
+    restart: always
+    networks:
+      mbr_test_network_[[NETWORK_NUMBER]]:
+        ipv4_address: "172.24.[[NETWORK_NUMBER]].[[POSTGRES_IP]]"
+    env_file:
+      - [[ENV_DIR]]/envs/.postgres.env
+    #environment:
+    #  - POSTGRES_USER=${POSTGRES_USER}
+    #  - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    #  - APP_DB_USER=${APP_DB_USER}
+    #  - APP_DB_PASS=${APP_DB_PASS}
+    #  - APP_DB_NAME=${APP_DB_NAME}
+    #  - FISHERMAN_DB_NAME=${FISHERMAN_DB_NAME}
+    # ports:
+    # - '5432:5432'
+    volumes:
+      # - db-data:/var/lib/postgresql/data
+      - [[ENV_DIR]]/migrations:/docker-entrypoint-initdb.d
+    extra_hosts:
+      - "hostmaster.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "ns1.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "ns2.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "api.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "stat.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "monitor.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "chain.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[CHAIN_IP]]"
+      - "portal.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "admin-api.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "dapi.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "scheduler.fisherman.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "gateway-dot-mainnet.monitor.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "gateway-eth-mainnet.monitor.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "node-eth-mainnet.monitor.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "node-dot-mainnet.monitor.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "node-eth-mainnet.stat.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "node-dot-mainnet.stat.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "gateway-eth-mainnet.stat.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "gateway-dot-mainnet.stat.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "api.ipapi.com:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "staking.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+
+  redis_[[NETWORK_NUMBER]]:
+    container_name: mbr_redis_[[NETWORK_NUMBER]]
+    image: redis:7.0.2-alpine
+    restart: always
+    networks:
+      mbr_test_network_[[NETWORK_NUMBER]]:
+        ipv4_address: "172.24.[[NETWORK_NUMBER]].[[REDIS_IP]]"
+    #ports:
+    #  - '6379:6379'
+    volumes:
+      - redis-data:/data
+    extra_hosts:
+      - "hostmaster.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "ns1.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "ns2.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "api.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "stat.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "monitor.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "chain.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[CHAIN_IP]]"
+      - "portal.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "admin-api.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "dapi.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "scheduler.fisherman.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "gateway-dot-mainnet.monitor.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "gateway-eth-mainnet.monitor.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "node-eth-mainnet.monitor.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "node-dot-mainnet.monitor.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "node-eth-mainnet.stat.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "node-dot-mainnet.stat.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "gateway-eth-mainnet.stat.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "gateway-dot-mainnet.stat.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "api.ipapi.com:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "staking.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+
+  massbitchain_[[NETWORK_NUMBER]]:
+    container_name: mbr_chain_[[NETWORK_NUMBER]]
+    image: massbit/massbitroute_chain:${MASSBIT_CHAIN_TAG}
+    # build: ../massbitchain
+    restart: always
+    networks:
+      mbr_test_network_[[NETWORK_NUMBER]]:
+        ipv4_address: "172.24.[[NETWORK_NUMBER]].[[CHAIN_IP]]"
+    ports:
+      - '60[[NETWORK_NUMBER]]:9944'
+
+volumes:
+  db-data:
+    driver: local
+  redis-data:
+    driver: local

@@ -1,0 +1,18 @@
+[
+  {
+    "method": "chain_getBlock",
+    "params": []
+  },
+  {
+    "method": "chain_getBlockHash",
+    "params": []
+  },
+  {
+    "method": "chain_getFinalizedHead",
+    "params": []
+  },
+  {
+    "method": "chain_getHeader",
+    "params": []
+  }
+]

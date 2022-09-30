@@ -1,0 +1,5 @@
+version: '3.8'
+networks:
+  mbr_test_network_[[NETWORK_NUMBER]]:
+    driver: bridge
+    external: true

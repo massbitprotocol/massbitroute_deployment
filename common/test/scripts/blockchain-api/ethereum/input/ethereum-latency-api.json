@@ -1,0 +1,54 @@
+[
+  {
+    "method": "eth_gasPrice",
+    "params": []
+  },
+  {
+    "method": "eth_blockNumber",
+    "params": []
+  },
+  {
+    "method": "eth_getBlockTransactionCountByNumber",
+    "params": ["latest"]
+  },
+  {
+    "method": "eth_getBlockTransactionCountByNumber",
+    "params": ["earliest"]
+  },
+  {
+    "method": "eth_getBlockTransactionCountByNumber",
+    "params": ["pending"]
+  },
+  {
+    "method": "eth_getUncleCountByBlockNumber",
+    "params": ["latest"]
+  },
+  {
+    "method": "eth_getUncleCountByBlockNumber",
+    "params": ["earliest"]
+  },
+  {
+    "method": "eth_getUncleCountByBlockNumber",
+    "params": ["pending"]
+  },
+  {
+    "method": "eth_getBlockByNumber",
+    "params": ["latest", false]
+  },
+  {
+    "method": "eth_getBlockByNumber",
+    "params": ["earliest", false]
+  },
+  {
+    "method": "eth_getBlockByNumber",
+    "params": ["pending", false]
+  },
+  {
+    "method": "eth_blockNumber",
+    "params": []
+  },
+  {
+    "method": "eth_blockNumber",
+    "params": []
+  }
+]

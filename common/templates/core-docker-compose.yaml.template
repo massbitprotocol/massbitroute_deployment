@@ -1,0 +1,122 @@
+version: '3.8'
+services:
+  api_[[NETWORK_NUMBER]]:
+    privileged: true
+    restart: unless-stopped
+    networks:
+      mbr_test_network_[[NETWORK_NUMBER]]:
+        ipv4_address: "172.24.[[NETWORK_NUMBER]].[[API_IP]]"
+
+    image: massbit/massbitroute_api:${API_TAG}
+    # command: sed -i "s|export WHITELIST_PARTNERS=.*|export WHITELIST_PARTNERS=\"allow 172.24.[[NETWORK_NUMBER]].[[PORTAL_IP]]\"|g" /massbit/massbitroute/app/src/sites/services/api/env/api.env
+    command: "-n"
+    # build:
+    #   context: /massbit/massbitroute/app/src/sites/services/api
+    #   dockerfile: install/mbr/build/api/Dockerfile.dev
+    #   args:
+    #     VERSION: 0.0.1-shamu-dev
+    #     BRANCH: shamu
+    container_name: mbr_api_[[NETWORK_NUMBER]]
+    # network_mode: "host"
+    # ports:
+    #   - "443:443"
+    volumes:
+      - ./api/logs:/massbit/massbitroute/app/src/sites/services/api/logs:rw
+      - ./api/vars:/massbit/massbitroute/app/src/sites/services/api/vars:rw
+      # - ./api/tmp:/massbit/massbitroute/app/src/sites/services/api/tmp:rw
+      - ./api/db:/massbit/massbitroute/app/src/sites/services/api/db:rw
+    environment:
+      - MBR_ENV=[[API_TAG]]
+      - MKAGENT_BRANCH=shamu
+      - GIT_PRIVATE_BRANCH=shamu
+      - GIT_PRIVATE_READ_URL=[[PRIVATE_GIT_READ]]
+    extra_hosts:
+      - "hostmaster.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "ns1.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "ns2.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "api.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "stat.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "monitor.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "chain.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[CHAIN_IP]]"
+      - "portal.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "admin-api.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "dapi.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "scheduler.fisherman.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "gateway-dot-mainnet.monitor.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "gateway-eth-mainnet.monitor.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "node-eth-mainnet.monitor.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "node-dot-mainnet.monitor.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "node-eth-mainnet.stat.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "node-dot-mainnet.stat.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "gateway-eth-mainnet.stat.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "gateway-dot-mainnet.stat.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "api.ipapi.com:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "staking.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "git.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[GIT_IP]]"
+
+  session_[[NETWORK_NUMBER]]:
+    privileged: true
+    restart: unless-stopped
+    networks:
+      mbr_test_network_[[NETWORK_NUMBER]]:
+        ipv4_address: "172.24.[[NETWORK_NUMBER]].[[SESSION_IP]]"
+
+    image: massbit/massbitroute_session:${SESSION_TAG}
+    command: "-n"
+    container_name: mbr_session_[[NETWORK_NUMBER]]
+    # network_mode: "host"
+    # ports:
+    #   - "443:443"
+    volumes:
+      - ./session/logs:/massbit/massbitroute/app/src/sites/services/session/logs:rw
+      - ./session/vars:/massbit/massbitroute/app/src/sites/services/session/vars:rw
+      - ./session/db:/massbit/massbitroute/app/src/sites/services/session/db:rw
+    environment:
+      - MBR_ENV=[[SESSION_TAG]]
+      - MKAGENT_BRANCH=shamu
+      - GIT_PRIVATE_BRANCH=shamu
+      - GIT_PRIVATE_READ_URL=[[PRIVATE_GIT_READ]]
+
+
+  gwman_[[NETWORK_NUMBER]]:
+    privileged: true
+    networks:
+      mbr_test_network_[[NETWORK_NUMBER]]:
+        ipv4_address: "172.24.[[NETWORK_NUMBER]].[[GWMAN_IP]]"
+
+    restart: unless-stopped
+    image: massbit/massbitroute_gwman:${GWMAN_TAG}
+    command: "-n"
+    # build:
+    #   context: /massbit/massbitroute/app/src/sites/services/gwman
+    #   dockerfile: install/mbr/build/gwman/Dockerfile.dev
+    #   args:
+    #     VERSION: 0.0.1-shamu-dev
+    #     BRANCH: shamu
+    container_name: mbr_gwman_[[NETWORK_NUMBER]]
+    volumes:
+      - ./gwman/logs:/massbit/massbitroute/app/src/sites/services/gwman/logs:rw
+      - ./gwman/vars:/massbit/massbitroute/app/src/sites/services/gwman/vars:rw
+      - ./gwman/db:/massbit/massbitroute/app/src/sites/services/gwman/db:rw
+    environment:
+      - GIT_PUBLIC_URL="https://github.com"
+      - MBR_ENV=[[GWMAN_TAG]]
+      - MKAGENT_BRANCH=shamu
+      - GIT_PRIVATE_BRANCH=shamu
+      - GIT_PRIVATE_READ_URL=[[PRIVATE_GIT_READ]]
+
+    extra_hosts:
+      - "hostmaster.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "ns1.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "ns2.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "api.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "stat.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "monitor.mbr.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "chain.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[CHAIN_IP]]"
+      - "portal.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "admin-api.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "dapi.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "scheduler.fisherman.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "api.ipapi.com:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "staking.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
+      - "git.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[GIT_IP]]"
