@@ -1,7 +1,6 @@
 #!/bin/bash
 ROOT_DIR=$(dirname $(realpath $0))
-export TEST_ENV=${1:-local}
-export network_number=${2:-10}
+export network_number=${1:-10}
 source $ROOT_DIR/base.sh
 
 mkdir -p $ENV_DIR/vars
@@ -55,7 +54,7 @@ cat $ROOT_DIR/../common/templates/gateway-docker-compose.yaml.template | \
 
 
 cp base.sh $ENV_DIR/
-cp read_tags.sh $ENV_DIR/
+cat $ROOT_DIR/read_tags.sh | sed "s|\[\[ENV_DIR\]\]|$ENV_DIR|g" > $ENV_DIR/read_tags.sh
 echo "source $ENV_DIR/read_tags.sh" >> $ENV_DIR/base.sh
 echo "source $ENV_DIR/envs/.env" >> $ENV_DIR/base.sh
 
