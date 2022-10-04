@@ -13,9 +13,9 @@ dataSource="https://34.87.134.109"
 dataSourceWs="wss://34.87.134.109/websocket"
 #State2: Create node
 docker exec mbr_proxy_$network_number /test/scripts/test_main_flow.sh _create_node $blockchain $network $dataSource $dataSourceWs $DOCKER_ID
-NODE_ID=$(cat $ENV_DIR/proxy/vars/${DOCKER_ID}/NODE_ID)
-NODE_APP_KEY=$(cat $ENV_DIR/proxy/vars/${DOCKER_ID}/NODE_APP_KEY)
-NODE_DATASOURCE=$(cat $ENV_DIR/proxy/vars/${DOCKER_ID}/NODE_DATASOURCE)
+NODE_ID=$(cat $ENV_DIR/proxy/vars/${DOCKER_ID})
+NODE_APP_KEY=$(cat $ENV_DIR/proxy/vars/${NODE_ID}/NODE_APP_KEY)
+NODE_DATASOURCE=$(cat $ENV_DIR/proxy/vars/${NODE_ID}/NODE_DATASOURCE)
 USER_ID=$(cat $ENV_DIR/proxy/vars/USER_ID)
 if [ "$NODE_ID" == "null" ]; then
   echo 'Test failed'

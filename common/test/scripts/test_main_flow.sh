@@ -70,7 +70,7 @@ _create_node() {
   else
     dataSourceWs=$4
   fi
-  SORT_ID=$5;
+  DOCKER_ID=$5
   echo "Create new node in Portal: In Progress at $now"
   curl -k --location --request POST "https://portal.$domain/mbr/node" \
     --header "Authorization: Bearer  $bearer" \
@@ -89,10 +89,12 @@ _create_node() {
     echo "----------------------------"
     echo "Node ID: $NODE_ID"
     echo "----------------------------"
-    mkdir -p /vars/$SORT_ID
-    echo $NODE_ID > /vars/$SORT_ID/NODE_ID
-    echo $NODE_APP_KEY > /vars/$SORT_ID/NODE_APP_KEY
-    echo $dataSource > /vars/$SORT_ID/NODE_DATASOURCE
+    mkdir -p /vars/$NODE_ID
+    echo $NODE_ID > /vars/$DOCKER_ID
+    echo $NODE_APP_KEY > /vars/$NODE_ID/NODE_APP_KEY
+    echo $blockchain > /vars/$NODE_ID/BLOCKCHAIN
+    echo $network > /vars/$NODE_ID/NETWORK
+    echo $dataSource > /vars/$NODE_ID/NODE_DATASOURCE
 }
 
 #-------------------------------------------
@@ -117,7 +119,7 @@ _create_gateway() {
   bearer=$(cat /vars/BEARER)
   blockchain=${1:-eth}
   network=${2:-mainnet}
-  SORT_ID=$3;
+  DOCKER_ID=$3
   curl -k --location --request POST "https://portal.$domain/mbr/gateway" \
     --header "Authorization: Bearer  $bearer" \
     --header 'Content-Type: application/json' \
@@ -125,16 +127,16 @@ _create_gateway() {
       \"name\":\"mbr-dev-gateway-$nodePrefix\",
       \"blockchain\":\"$blockchain\",
       \"zone\":\"AS\",
-      \"network\":\"mainnet\"}" | jq -r '. | .id, .appKey' | sed -z -z 's/\n/,/g;s/,$/,AS\n/' > gatewaylist.csv
+      \"network\":\"$network\"}" | jq -r '. | .id, .appKey' | sed -z -z 's/\n/,/g;s/,$/,AS\n/' > gatewaylist.csv
   GATEWAY_ID=$(cut -d ',' -f 1 gatewaylist.csv)
   GATEWAY_APP_KEY=$(cut -d ',' -f 2  gatewaylist.csv)
   echo "        GW INFO        "
   echo "----------------------------"
   echo "Gateway ID: $GATEWAY_ID"
   echo "----------------------------"
-  mkdir -p /vars/$SORT_ID
-  echo $GATEWAY_ID > /vars/$SORT_ID/GATEWAY_ID
-  echo $GATEWAY_APP_KEY > /vars/$SORT_ID/GATEWAY_APP_KEY
+  mkdir -p /vars/$GATEWAY_ID
+  echo $GATEWAY_ID > /vars/$DOCKER_ID
+  echo $GATEWAY_APP_KEY > /vars/$GATEWAY_ID/GATEWAY_APP_KEY
 }
 _register_providers() {
   providerType="${1,,}"
@@ -149,10 +151,11 @@ _register_providers() {
   else
     providerId=$2
   fi
-
-  register_provider=$(curl -s --location --request POST "https://staking.$domain/massbit/admin/register-provider" \
+  blockchain=$(cat /vars/$providerId/BLOCKCHAIN)
+  network=$(cat /vars/$providerId/NETWORK)
+  register_provider=$(curl --location --request POST "http://staking.$domain/massbit/admin/register-provider" \
      --header 'Content-Type: application/json' --data-raw "{
-       \"operator\": \"$admin_wallet_address\",
+       \"operator\": \"$TEST_WALLET_ADDRESS\",
        \"providerId\": \"$providerId\",
        \"providerType\": \"$providerType\",
        \"blockchain\": \"$blockchain\",
@@ -283,15 +286,7 @@ _stake_provider() {
 _check_provider_status() {
   bearer=$(cat /vars/BEARER)
   providerType="${1,,}"
-  if [ "x$3" == "x" ]; then
-    if [ "$providerType" == "gateway" ]; then
-      providerId=$(cat /vars/GATEWAY_ID)
-    else
-      providerId=$(cat /vars/NODE_ID)
-    fi
-  else
-    providerId=$3
-  fi
+  providerId=$3
   status=''
   start=$(date +"%s")
   end=$start
@@ -309,41 +304,22 @@ _check_provider_status() {
     now=$(date)
     end=$(date +"%s")
     duration=$(( $end-$start ))
-    echo "---------------------------------"
+    echo "---------------------------------------"
     echo "$providerType status at $now is $status"
-    echo "---------------------------------"
+    echo "---------------------------------------"
+
+    if [[ "x$status" == "xverified" && "x$2" == "xapproved" ]]; then
+      _register_providers $providerType $providerId
+      echo "Wating for register $providerType  $providerId"
+    fi
     sleep 10
   done
   echo "Checking $providerType reported status: $status at $now in ${duration}s"
-  if [ "x$status" == "xverified" ]; then
-    _register_providers $providerType $providerId
-    echo "Wating for register $providerType  $providerId"
-    sleep 30
-    if [ "x$2" == "xapproved" ]; then
-      while [ \( "$status" != "$2" \) -a \( $duration -le $PROVIDER_STATUS_TIMEOUT \) ]; do
-      #while [[ "$status" != "$2" ]]; do
-        echo "Checking $providerType status: In Progress"
-        cat /logs/proxy_access.log | grep "$providerId" | grep '.10->api.' | grep 'POST' | grep "$providerType.update"
-        #if [ $? -eq 0 ];then break;fi
-
-        status=$(curl -k --silent --location --request GET "https://portal.$DOMAIN/mbr/$providerType/$providerId" \
-          --header "Authorization: Bearer $bearer" | jq -r ". | .status")
-        now=$(date)
-        end=$(date +"%s")
-        duration=$(( $end-$start ))
-        echo "---------------------------------"
-        echo "$providerType status at $now is $status"
-        echo "---------------------------------"
-        sleep 10
-      done
-    fi
-  fi
   echo $status > /vars/status/$providerId
   if [ "$status" != "$2" ]; then
     echo "Test failed. Expectation status is $2"
     exit 1
   fi
-
 }
 
 $@
