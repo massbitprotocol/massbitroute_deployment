@@ -14,7 +14,7 @@ for (( k = 0; k<$LOOP; k++ )); do
   printf "Create gateway with docker ID %s\n" $DOCKER_ID
   #State5: Create gateway
   docker exec mbr_proxy_$network_number /test/scripts/test_main_flow.sh _create_gateway $blockchain $network $DOCKER_ID
-  GATEWAY_ID=$(cat $ENV_DIR/proxy/vars/${DOCKER_ID}/GATEWAY_ID)
+  GATEWAY_ID=$(cat $ENV_DIR/proxy/vars/${DOCKER_ID})
   GATEWAY_APP_KEY=$(cat $ENV_DIR/proxy/vars/${DOCKER_ID}/GATEWAY_APP_KEY)
   if [ "$GATEWAY_ID" == "null" ]; then
     echo 'Test failed'
