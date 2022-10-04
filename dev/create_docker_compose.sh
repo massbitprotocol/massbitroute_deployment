@@ -42,9 +42,9 @@ do
   cat $ENV_DIR/templates/${file}.yaml.template | sed "s|\[\[PRIVATE_GIT_READ\]\]|$PRIVATE_GIT_READ|g" > $ENV_DIR/${file}.yaml
   docker_compose_files="$docker_compose_files -f $ENV_DIR/${file}.yaml"
 done
-echo "docker-compose -f network-docker-compose.yaml -f db-docker-compose.yaml --env-file /massbit/test_runtime/10/envs/.env up -d --force-recreate" > $ENV_DIR/start_core.sh
+echo "docker-compose -f network-docker-compose.yaml -f db-docker-compose.yaml --env-file $ENV_DIR/envs/.env up -d --force-recreate" > $ENV_DIR/start_core.sh
 echo "sleep 30" >> $ENV_DIR/start_core.sh
-echo "docker-compose -f network-docker-compose.yaml -f core-docker-compose.yaml -f portal-docker-compose.yaml -f fisherman-docker-compose.yaml --env-file /massbit/test_runtime/10/envs/.env up -d --force-recreate" >> $ENV_DIR/start_core.sh
+echo "docker-compose -f network-docker-compose.yaml -f core-docker-compose.yaml -f portal-docker-compose.yaml -f fisherman-docker-compose.yaml --env-file $ENV_DIR/envs/.env up -d --force-recreate" >> $ENV_DIR/start_core.sh
 chmod +x $ENV_DIR/start_core.sh
 #add extra host file for fisherman scheduler
 #stat & monitor
