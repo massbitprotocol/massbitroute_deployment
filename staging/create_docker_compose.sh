@@ -25,7 +25,7 @@ do
        sed "s/\[\[FISHERMAN_SCHEDULER_IP\]\]/$FISHERMAN_SCHEDULER_IP/g" | \
        sed "s/\[\[FISHERMAN_WORKER01_IP\]\]/$FISHERMAN_WORKER01_IP/g" | \
        sed "s/\[\[FISHERMAN_WORKER02_IP\]\]/$FISHERMAN_WORKER02_IP/g" | \
-       sed "s/\[\[FISHER_ENVIRONMENT\]\]/$FISHER_ENVIRONMENT/g" | \
+       sed "s/\[\[FISHERMAN_ENVIRONMENT\]\]/$FISHERMAN_ENVIRONMENT/g" | \
        sed "s/\[\[PORTAL_IP\]\]/$PORTAL_IP/g" | \
        sed "s/\[\[CHAIN_IP\]\]/$CHAIN_IP/g" | \
        sed "s/\[\[WEB_IP\]\]/$WEB_IP/g" | \
@@ -42,9 +42,9 @@ do
   cat $ENV_DIR/templates/${file}.yaml.template | sed "s|\[\[PRIVATE_GIT_READ\]\]|$PRIVATE_GIT_READ|g" > $ENV_DIR/${file}.yaml
   docker_compose_files="$docker_compose_files -f $ENV_DIR/${file}.yaml"
 done
-echo "docker-compose -f network-docker-compose.yaml -f db-docker-compose.yaml --env-file /massbit/test_runtime/10/envs/.env up -d --force-recreate" > $ENV_DIR/start_core.sh
+echo "docker-compose -f network-docker-compose.yaml -f db-docker-compose.yaml --env-file $ENV_DIR/envs/.env up -d --force-recreate" > $ENV_DIR/start_core.sh
 echo "sleep 30" >> $ENV_DIR/start_core.sh
-echo "docker-compose -f network-docker-compose.yaml -f core-docker-compose.yaml -f portal-docker-compose.yaml -f fisherman-docker-compose.yaml --env-file /massbit/test_runtime/10/envs/.env up -d --force-recreate" >> $ENV_DIR/start_core.sh
+echo "docker-compose -f network-docker-compose.yaml -f core-docker-compose.yaml -f portal-docker-compose.yaml -f fisherman-docker-compose.yaml --env-file $ENV_DIR/envs/.env up -d --force-recreate" >> $ENV_DIR/start_core.sh
 chmod +x $ENV_DIR/start_core.sh
 #add extra host file for fisherman scheduler
 #stat & monitor

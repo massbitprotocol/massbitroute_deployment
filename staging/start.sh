@@ -2,7 +2,7 @@
 ROOT_DIR=$(dirname $(realpath $0))
 export network_number=[[NETWORK_NUMBER]]
 source $ROOT_DIR/base.sh
-source $ROOT_DIR/envs/.env
+
 export ENV_DIR=$ROOT_DIR
 
 $ROOT_DIR/start_core.sh
