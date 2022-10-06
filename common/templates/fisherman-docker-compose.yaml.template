@@ -16,13 +16,7 @@ services:
       - ./fisherman/.env_fisherman:/usr/local/bin/.env_fisherman
       - ./fisherman/worker01/log:/var/log/fisherman
     environment:
-      - BENCHMARK_WRK_PATH=/usr/local/bin/worker/benchmark
-      - COMMON_CONFIG_FILE=/usr/local/bin/worker/configs/common.json
       - DOMAIN=massbitroute.net
-      - ENVIRONMENT=[[FISHERMAN_ENVIRONMENT]]
-      - ROOT=/massbit/massbitroute/app/src/sites/services/gateway/
-      - RUNTIME_MODE=FISHERMAN
-      - RUST_LOG=debug
       - SCHEDULER_AUTHORIZATION=[[SCHEDULER_AUTHORIZATION]]
       - SCHEDULER_ENDPOINT=[[PROTOCOL]]://scheduler.fisherman.massbitroute.net:80
       - WORKER_SERVICE_ENDPOINT=0.0.0.0:4040
@@ -30,6 +24,8 @@ services:
       - WORKER_IP=172.24.[[NETWORK_NUMBER]].[[FISHERMAN_WORKER01_IP]]
       - WORKER_ENDPOINT=[[PROTOCOL]]://worker01.fisherman.massbitroute.net:4040
       - ZONE=AS
+      - RUNTIME_MODE=FISHERMAN    
+
     extra_hosts:
       - "hostmaster.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
       - "ns1.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
@@ -69,13 +65,7 @@ services:
       - ./fisherman/.env_fisherman:/usr/local/bin/.env_fisherman
       - ./fisherman/worker02/log:/var/log/fisherman
     environment:
-      - BENCHMARK_WRK_PATH=/usr/local/bin/worker/benchmark
-      - COMMON_CONFIG_FILE=/usr/local/bin/worker/configs/common.json
       - DOMAIN=massbitroute.net
-      - ENVIRONMENT=[[FISHERMAN_ENVIRONMENT]]
-      - ROOT=/massbit/massbitroute/app/src/sites/services/gateway/
-      - RUNTIME_MODE=FISHERMAN
-      - RUST_LOG=debug
       - SCHEDULER_AUTHORIZATION=[[SCHEDULER_AUTHORIZATION]]
       - SCHEDULER_ENDPOINT=[[PROTOCOL]]://scheduler.fisherman.massbitroute.net:80
       - WORKER_SERVICE_ENDPOINT=0.0.0.0:4040
@@ -83,6 +73,7 @@ services:
       - WORKER_IP=172.24.[[NETWORK_NUMBER]].[[FISHERMAN_WORKER02_IP]]
       - WORKER_ENDPOINT=[[PROTOCOL]]://worker02.fisherman.massbitroute.net:4040
       - ZONE=AS
+      - RUNTIME_MODE=FISHERMAN    
     extra_hosts:
       - "hostmaster.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
       - "ns1.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"
@@ -126,16 +117,15 @@ services:
     environment:
       - DATABASE_URL=postgres://postgres:postgres@db_[[NETWORK_NUMBER]]:5432/massbit-fisherman
       - DOMAIN=massbitroute.net
-      - ENVIRONMENT=[[FISHERMAN_ENVIRONMENT]]
       - PORTAL_AUTHORIZATION=VERIFICATION_SERVICE_SECRET
       - REPORT_CALLBACK=[[PROTOCOL]]://scheduler.fisherman.massbitroute.net/report
-      - RUNTIME_MODE=SCHEDULER
       - SCHEDULER_AUTHORIZATION=[[SCHEDULER_AUTHORIZATION]]
       - SCHEDULER_ENDPOINT=0.0.0.0:80
-      - SCHEME=http
+      - SCHEME=[[PROTOCOL]]
       - URL_PORTAL=[[PROTOCOL]]://portal.massbitroute.net
       - URL_PORTAL_PROJECTS=[[PROTOCOL]]://portal.massbitroute.net/mbr/d-apis/project/list/verify
       - URL_CHAIN=ws://chain.massbitroute.net:9944
+      - RUNTIME_MODE=SCHEDULER
 
     extra_hosts:
       - "hostmaster.massbitroute.net:172.24.[[NETWORK_NUMBER]].[[PROXY_IP]]"

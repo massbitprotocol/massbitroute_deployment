@@ -137,6 +137,8 @@ _create_gateway() {
   mkdir -p /vars/$GATEWAY_ID
   echo $GATEWAY_ID > /vars/$DOCKER_ID
   echo $GATEWAY_APP_KEY > /vars/$GATEWAY_ID/GATEWAY_APP_KEY
+  echo $network > /vars/$GATEWAY_ID/NETWORK
+  echo $blockchain > /vars/$GATEWAY_ID/BLOCKCHAIN
 }
 _register_providers() {
   providerType="${1,,}"
