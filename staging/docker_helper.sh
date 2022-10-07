@@ -6,5 +6,6 @@ _get_running_tag ()
 _cleanup ()
 {
 	docker rm  $(docker ps | grep _10 | cut -d " " -f 1) -f
+	rm -rf /massbit/test_runtime/10 
 }
 $@

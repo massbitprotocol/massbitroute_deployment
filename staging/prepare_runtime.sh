@@ -68,4 +68,4 @@ chmod +x $ENV_DIR/start.sh
 mkdir -p $ENV_DIR/scenarios
 cp $ROOT_DIR/../common/scenarios/*.* $ENV_DIR/scenarios
 cp -r $ROOT_DIR/../common/scripts $ENV_DIR
-#bash -x $ENV_DIR/start.sh
+bash -x $ENV_DIR/start.sh
