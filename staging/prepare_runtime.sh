@@ -1,8 +1,8 @@
 #!/bin/bash
 ROOT_DIR=$(dirname $(realpath $0))
-export TEST_ENV=${1:-local}
-export network_number=${2:-10}
+export network_number=${1:-10}
 source $ROOT_DIR/base.sh
+
 mkdir -p $ENV_DIR/vars
 mkdir -p $ENV_DIR/nodes
 mkdir -p $ENV_DIR/gateways
@@ -18,10 +18,12 @@ if [ "$CHECKNETWORK" == "0" ]; then
 fi
 cp -r $ROOT_DIR/../common/migrations $ENV_DIR
 cp -r $ROOT_DIR/../common/scheduler $ENV_DIR
+cp -r $ROOT_DIR/../common/fisherman $ENV_DIR
 cp -r $ROOT_DIR/envs $ENV_DIR
 cat $ROOT_DIR/envs/.env \
   | sed "s/\[\[NETWORK_NUMBER\]\]/$network_number/g" \
   > $ENV_DIR/envs/.env
+
 bash -x $ROOT_DIR/prepare_proxy.sh
 bash -x create_docker_compose.sh
 
@@ -52,6 +54,10 @@ cat $ROOT_DIR/../common/templates/gateway-docker-compose.yaml.template | \
 
 
 cp base.sh $ENV_DIR/
+cat $ROOT_DIR/read_tags.sh | sed "s|\[\[ENV_DIR\]\]|$ENV_DIR|g" > $ENV_DIR/read_tags.sh
+echo "source $ENV_DIR/read_tags.sh" >> $ENV_DIR/base.sh
+echo "source $ENV_DIR/envs/.env" >> $ENV_DIR/base.sh
+
 cat $ROOT_DIR/start.sh \
   | sed "s/\[\[NETWORK_NUMBER\]\]/$network_number/g" \
   | sed "s/\[\[COMMAND_CORE_DOCKER_COMPOSE\]\]/$COMMAND_CORE_DOCKER_COMPOSE/g" \
@@ -62,4 +68,4 @@ chmod +x $ENV_DIR/start.sh
 mkdir -p $ENV_DIR/scenarios
 cp $ROOT_DIR/../common/scenarios/*.* $ENV_DIR/scenarios
 cp -r $ROOT_DIR/../common/scripts $ENV_DIR
-#bash -x $ENV_DIR/start.sh
+bash -x $ENV_DIR/start.sh
