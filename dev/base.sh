@@ -1,5 +1,5 @@
 #!/bin/bash
-export RUNTIME_DIR=/massbit/test_runtime
+export RUNTIME_DIR=/home/huy/work/test_runtime
 export network_prefix=mbr_test_network
 export network_name=${network_prefix}_$network_number
 export ENV_DIR=$RUNTIME_DIR/$network_number

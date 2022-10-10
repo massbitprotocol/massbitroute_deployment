@@ -7,7 +7,7 @@ mkdir -p $ENV_DIR/vars
 mkdir -p $ENV_DIR/nodes
 mkdir -p $ENV_DIR/gateways
 mkdir -p $ENV_DIR/envs
-bash ../common/check_latest_tag.sh _read_latest_git_tags
+#bash ../common/check_latest_tag.sh _read_latest_git_tags
 #Create if not exists network
 echo "--------------------------------------------"
 echo "Creating network 172.24.$network_number.0/24"
