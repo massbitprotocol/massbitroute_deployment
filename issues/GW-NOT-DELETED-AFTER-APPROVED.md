@@ -5,6 +5,7 @@
 </p>
 
 ## Issue
+
 - On Computer A, sign in to Admin Portal, approving verified gateways --> Gateways disappear in Verified gws
 - On Computer B, sign in to Admin Portal, approved verified gateways do not disappear
 - On Computer B, try to approve those that do not disappear, result in error
