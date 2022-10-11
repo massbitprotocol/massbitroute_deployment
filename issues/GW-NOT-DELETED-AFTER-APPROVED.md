@@ -1,3 +1,3 @@
 <p align="center">
-    <img src="https://i.imgur.com/OtlK2qU.png" width=600>
+    <img src="https://github.com/massbitprotocol/massbitroute_deployment/blob/minh-dev/issues/images/GW-NOT-DELETED-AFTER-APPROVED.png?raw=true" width=600>
 </p>
